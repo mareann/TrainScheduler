@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Train Schedule</title>	
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <!--  JQUERY  -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+  <div class="container">
+    <h2>Table</h2>
+    <p>The .table-responsive class creates a responsive table which will scroll horizontally on small devices (under 768px). When viewing on anything larger than 768px wide, there is no difference:</p>                                                                                      
+  <div class="table-responsive">          
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Train Name</th>
+          <th>Destination</th>
+          <th>Frequency (min)</th>
+          <th>Next Arrival</th>
+          <th>Minutes Away</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Express</td>
+          <td>Tenton</td>
+          <td>25</td>
+          <td>05:35 PM</td>
+          <td>10</td>
+        </tr>
+      </tbody>
+    </table>
+  </div> <!-- end table -->
+
+  <form>
+  	<h2>Add Train</h2>
+  <div class="input-group">
+      <span class="input-group-addon">Train Name</span>
+      <input id="msg" type="text" class="form-control" name="msg" placeholder="train name">
+  </div>
+  <div class="input-group">
+      <span class="input-group-addon">Destination&nbsp;</span>
+      <input id="msg" type="text" class="form-control" name="msg" placeholder="final location">
+  </div>
+  <div class="input-group">
+      <span class="input-group-addon">Train Time&nbsp;&nbsp;</span>
+      <input id="msg" type="text" class="form-control" name="msg" placeholder="first train time">
+  </div>
+  <div class="input-group">
+      <span class="input-group-addon">Frequency&nbsp;&nbsp;</span>
+      <input id="msg" type="text" class="form-control" name="msg" placeholder="Frequency (min)">
+  </div>
+  <button type="submit" class="btn btn-default">Submit</button>
+</form>
+</div> <!-- end container -->
+<script src="https://www.gstatic.com/firebasejs/4.9.0/firebase.js"></script>
+<script type="text/javascript">
+  // Initialize Firebase
+  var config = {
+    apiKey: "AIzaSyAA2-YiZZlPUslvIq03lgC4d5uqdYRDQlQ",
+    authDomain: "train-schedule-dee51.firebaseapp.com",
+    databaseURL: "https://train-schedule-dee51.firebaseio.com",
+    projectId: "train-schedule-dee51",
+    storageBucket: "",
+    messagingSenderId: "515859285234"
+  };
+  firebase.initializeApp(config);	
+
+
+</script>	
+</body>
+</html>
