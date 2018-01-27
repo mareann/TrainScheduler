@@ -3,12 +3,57 @@
 }
 
 .input-group-addon {
-   background-color: mediumblue;
+   background-color: blue;
    color: white;
 }
 
 form {
-	border: 0.25em solid lightblue;
 	padding: 1em;
-	background-color: lightblue;
+}
+
+div.container {
+	width: 85%;
+}
+
+td {
+	padding-right: 3em;
+	padding-left: 3em;
+}
+
+div.heading {
+	margin-bottom: 25px;
+	padding: 20px;
+	background-color: black;
+	color: white;
+}
+
+div.box {
+	margin-bottom: 25px;
+	border: 1px solid black;
+}
+
+h1 {
+	font-size: 50px;
+}
+
+h2 {
+	font-size: 25px;
+}
+
+h3 {
+	margin: 0px;
+	padding: 10px;
+	background-color: blue;
+	font-size: 15px;
+	font-weight: bold;
+	color: white;
+}
+
+th {
+	font-weight: bold;
+}
+
+#submitButton {
+	background-color: red;
+	font-weight: bold;
 }

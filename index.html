@@ -9,39 +9,53 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
   <link rel="stylesheet" href="assets/css/style.css">
-      <!-- Moment.js Reference -->
-    <!-- <script src="http://momentjs.com/downloads/moment.js"></script>   -->
-    <script src="https://cdn.jsdelivr.net/momentjs/2.12.0/moment.min.js"></script>
+  <!-- Moment.js Reference -->
+  <!-- <script src="http://momentjs.com/downloads/moment.js"></script>   -->
+  <script src="https://cdn.jsdelivr.net/momentjs/2.12.0/moment.min.js"></script>
 </head>
 <body>
   <div class="container">
-    <h2>Table</h2>
-    <p>The .table-responsive class creates a responsive table which will scroll horizontally on small devices (under 768px). When viewing on anything larger than 768px wide, there is no difference:</p>                                                                                      
-  <divclass="table-responsive">          
-    <table  id="trainTable" class="table">
-      <thead>
-        <tr>
-          <th>Train Name</th>
-          <th>Destination</th>
-          <th>Frequency (min)</th>
-          <th>Next Arrival</th>
-          <th>Minutes Away</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
-        </tr>
-      </tbody>
-    </table>
-  </div> <!-- end table -->
+      
+      <div class="row">
+        <div class="heading">
+          <h1>Train Schedule</h1>
+          <h2>Enter new trains below</h2>
+          <h5 id="timePlace"></h5>
+        </div>
+      </div>
 
-  <form>
-  	<h2>Add Train</h2>
+  <div class="row">                                                               
+   <div class="table-responsive">   
+    <h3>Current Train Schedule</h3>
+    <div class="box">
+      <table id="trainTable" class="table">
+       <thead>
+         <tr>
+           <th>Train Name</th>
+           <th>Destination</th>
+           <th>Frequency (min)</th>
+           <th>Next Arrival</th>
+           <th>Minutes Away</th>
+         </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+          </tr>
+        </tbody>
+      </table>
+     </div>
+   </div> <!-- end table -->
+  </div>
+
+  <div class="row box">
+    <h3>Add Train</h3>
+   <form>
+  	
     <div class="input-group">
       <span class="input-group-addon">Train Name</span>
       <input id="inputName" type="text" class="form-control" name="msg" placeholder="train name">
@@ -59,7 +73,9 @@
       <input id="inputFreq" type="text" class="form-control" name="msg" placeholder="Frequency (min)">
     </div>
     <button id="submitButton" type="submit" class="btn btn-default">Submit</button>
-</form>
+  </form>
+ </div>
+
 </div> <!-- end container -->
 <script src="https://www.gstatic.com/firebasejs/4.9.0/firebase.js"></script>
 <script type="text/javascript">
@@ -75,52 +91,92 @@
 
   firebase.initializeApp(config);	
   var database = firebase.database();
+ // var refreshCount =0;
+  var timeToRefresh = 15*1000; //300*1000;
+  var displayRowAddedFlag = 0;
+  var trainClick = 0;
 
+ // setTimeout(displayRefresh,timeToRefresh);
+//  const display = database.ref().child("display");
+//  const trains = database.ref().child("trains");
 
+function displayRefresh() {
+   refreshCount++; 
 
+   database.ref().child("display").set({
+ //  display.child(refreshCount).set({
+        "refreshCount":refreshCount
+  });
+
+ //   if ( refreshCount >= 0) {
+  //    display.update(
+  //      refreshCount: refreshCount
+  //} , function(errorObject) {
+      //console.log("error "+errorObject.code);
+  //  ) // end errorObject
+//} // end if
+    setTimeout(displayRefresh,timeToRefresh);
+    console.log("displayRefresh "+refreshCount);
+} // end displayRefresh
+// This function allows you to update your page in real-time when the firebase database changes.
+database.ref().on("value", function(snapshot) {
+    // If any errors are experienced, log them to console.
+      // Store everything into a variable.
+  var trainName = snapshot.val().trainName;
+  var trainDest = snapshot.val().trainDest;
+  var trainTime = snapshot.val().trainTime;
+  var trainFreq = snapshot.val().trainFreq;
+ // var tmp = snapshot.val().display.refreshCount;
+ // console.log("db value refreshCount "+refreshCount+" tmp "+tmp);
+  // Employee Info
+//  console.log("db value "+trainName);
+//  console.log("db value "+trainDest);
+//  console.log("db value "+trainTime);
+//  console.log("db value "+trainFreq);
+  //  console.log("value snap "+snapshot);
+
+}, function(errorObject) {
+  console.log("VALUE The read failed: " + errorObject.code);
+});
+
+/////////////////////////////////////////////////////////////////////
  // Adding click event listener
-  $("#submitButton").on("click", function(event) {
-      event.preventDefault();
+$("#submitButton").on("click", function(event) {
+  event.preventDefault();
 
-     var trainName = $("#inputName").val().trim();
-     var trainDest = $("#inputDest").val().trim();
-     var trainTime = $("#inputTime").val().trim();
-     var trainFreq = $("#inputFreq").val().trim();
+  var trainName = $("#inputName").val().trim();
+  var trainDest = $("#inputDest").val().trim();
+  var trainTime = $("#inputTime").val().trim();
+  var trainFreq = $("#inputFreq").val().trim();
 
-     console.log("name "+trainName);
-     console.log("dest "+trainDest);
-     console.log("time "+trainTime);
-     console.log("freq "+trainFreq);
+  //   console.log("name "+trainName);
+  //   console.log("dest "+trainDest);
+  //   console.log("time "+trainTime);
+  //   console.log("freq "+trainFreq);
 
   // Creates local "temporary" object for holding employee data
-  var trains = {
+  var trainInfo = {
     trainName: trainName,
     trainDest: trainDest,
     trainTime: trainTime,
     trainFreq: trainFreq
   };
 
-  // Uploads employee data to the database
-  database.ref().push(trains);
 
-  console.log("obj name "+trains.trainName);
+  database.ref().push(trainInfo);
 
-  // 3. Create Firebase event for adding employee to the database and a row in the html when a user adds an entry
-  database.ref().on("child_added", function(childSnapshot, prevChildKey) {
+  //console.log("click add NAME "+trainName);
 
-  console.log("childSnapshot "+childSnapshot.val());
+///////////////////////////////////////////////////////////////////////////////
+ database.ref().on("child_added", function(childSnapshot, prevChildKey) {
 
   // Store everything into a variable.
   var trainName = childSnapshot.val().trainName;
   var trainDest = childSnapshot.val().trainDest;
   var trainTime = childSnapshot.val().trainTime;
   var trainFreq = childSnapshot.val().trainFreq;
-
-  // Employee Info
-  console.log("db "+trainName);
-  console.log(trainDest);
-  console.log(trainTime);
-  console.log(trainFreq);
+  
+  //console.log("db childsnap NAME "+trainName+" dest "+trainDest+" time "+trainTime+" freq "+trainFreq);
 
   var timeMinToArrive = trainInfoDisplay( trainName, trainDest,trainTime,trainFreq );
   var timeNow = moment();
@@ -130,109 +186,83 @@
     var trainTimeTmp = moment(trainTime).format("hh:mm A");
     // format train time (HH:mm)
     trainTime = moment(trainTime).format("HH:mm");
+    
+    //console.log("timeNow "+timeNow+" timeMinToArrive "+timeMinToArrive);
+    //console.log("flag "+displayRowAddedFlag+" NEW add to table NAME "+trainName+" trainTime "+trainTime);
+    if ( !displayRowAddedFlag ) {
+     // Add each train's data into the table
+     $("#trainTable > tbody").append("<tr><td>" + trainName + "</td><td>" + trainDest + "</td><td>" + trainFreq + "</td><td>" + trainTime +" ("+trainTimeTmp+") "  + "</td><td>" +timeMinToArrive+"</td></tr>");
+          displayRowAddedFlag = 1;
+       }
+    }, function(errorObject){
+     console.log("error "+errorObject.code);
+  })
 
-
- // trainTime = moment(timeNow).add(timeMinToArrive).format("HH:mm");
-    console.log("timeNow "+timeNow+" timeMinToArrive "+timeMinToArrive);
-    console.log("NEW add to table trainTime "+trainTime);
-    // Add each train's data into the table
-    $("#trainTable > tbody").append("<tr><td>" + trainName + "</td><td>" + trainDest + "</td><td>" + trainFreq + "</td><td>" + trainTime +" ("+trainTimeTmp+") "  + "</td><td>" +timeMinToArrive+"</td></tr>");
- // for ( var i=0;i< (1440/trainFreq);i++)
-  //var numOfTrains = (1440/trainFreq);
-  //console.log("num of Trains "+numOfTrains);
-
-  //var timePretty = moment(trainTime, 'HH:mm').add(trainFreq,'minutes').format("HH:mm");
-  console.log("add table row timePretty "+timePretty);
-
-  // Add each train's data into the table
- //  $("#trainTable > tbody").append("<tr><td>" + trainName + "</td><td>" + trainDest + "</td><td>" + trainFreq + "</td><td>" + trainTime + "</td><td>" +timeMinToArrive+"</td></tr>");
-  $("#trainTable > tbody").append("<tr><td>" + trainName + "</td><td>" + trainDest + "</td><td>" +trainFreq + "</td><td>" + timePretty + "</td><td>" +trainFreq+"</td></tr>");
-});
-
-
-  }); // end click
+}); // end click
 //////////////////////////////////////////////////////
-      function trainInfoDisplay( trainName, trainDest,trainTime,trainFreq)
-      {
-        var trainFirstTime = trainTime;
-        var timeMinToArrive = 0;
+ function trainInfoDisplay( trainName, trainDest,trainTime,trainFreq)
+   {
+      var trainFirstTime = trainTime;
+      var timeMinToArrive = 0;
 
-      // To calculate 
-        var now = moment();
-        var currentTime = moment(now).format("HH:mm");
-        //console.log("currentTime "+currentTime);
-        //console.log("trainFreq "+trainFreq);
+      var now = moment();
+      var currentTime = moment(now).format("HH:mm");
+      $("#timePlace").text("Time: "+currentTime);
       
-        var numOfTrains = (1440/trainFreq);
-
-    //if (trainName === "Downtown") {
-        var trainArrivals = [];
-        console.log("=====arrival trainFirstTime "+trainFirstTime+" Freq "+trainFreq+" numOfTrains "+numOfTrains);
-        var trainCount = parseInt(numOfTrains/2);
-        for (i=0; i< trainCount ;i++)
+      var numOfTrains = (1440/trainFreq);
+      var trainArrivals = [];
+      //  console.log("=====arrival trainFirstTime "+trainFirstTime+" Freq "+trainFreq+" numOfTrains "+numOfTrains);
+      var trainCount = parseInt(numOfTrains/2);
+      for (i=0; i< trainCount ;i++)
         {
           var tmp = moment(trainFirstTime,"HH:mm");
-          //if(i==1)
-            //console.log("tmp trainFirstTime "+moment(tmp).format("HH:mm"));
           var minToAdd = trainFreq*i;
-          //trainArrivals[i] = moment(tmp).add(minToAdd,'m').format("HH:mm");
           trainArrivals[i] = moment(tmp).add(minToAdd,'m');
-          //if (i==1)
-          console.log("trainArrivals["+i+"] "+moment(trainArrivals[i]).format("HH:mm")+" min "+trainArrivals[i]);
-          //if (i==1)
-          //a.diff(b, 'years', true); // 1.75
-          //var timeArrivalMin = moment(trainArrivals[i]).format('m');
           var currentMin = moment(now).format('m');
-          //console.log("currentMin "+currentMin);
-
           var timeDiff = trainArrivals[i].diff(now);
-          console.log("trainArrivals "+trainArrivals[i]+" now "+now+" timeDiff "+timeDiff);
-          //console.log("timeMin "+timeArrivalMin+" timeDiff "+timeDiff);
 
-          //var timeDiff2 = now.diff(trainArrivals[i]);
-          //  console.log("timeDiff2 "+timeDiff2);
           trainTime = moment(trainArrivals[i]).format("HH:mm");
-          if ( timeDiff > 0 ) //|| timeDiff2 < 0 )
+          if ( timeDiff > 0 ) 
            {
              timeMinToArrive = moment(timeDiff).format('m');//= Math.round(timeDiff);
-
-             //console.log("timeMin "+timeArrivalMin+" timeDiff "+timeDiff);
-             //console.log("timeMinToArrive "+timeMinToArrive);
              //console.log("arrivals "+trainArrivals[i]+" new trainTime "+trainTime);
              i=trainCount;
             
            }
-        }
-     // }
+        } // end for
+
         return(timeMinToArrive);
-    } // end function
+  } // end function
 ///////////////////////////////////////////
 
-    database.ref().on("child_added",function(snapshot){
+  database.ref().on("child_added",function(snapshot){
 
-      //console.log("snap time "+snapshot.val().trainTime);
-
-      var trainName = snapshot.val().trainName;
-      var trainDest = snapshot.val().trainDest;
-      var trainTime = snapshot.val().trainTime;
-    //  var trainFirstTime = snapshot.val().trainTime;
-      var trainFreq = snapshot.val().trainFreq;
-      var timeMinToArrive = 0;
-      var timeNow = moment();
-      timeMinToArrive = trainInfoDisplay( trainName, trainDest,trainTime,trainFreq );
+    var trainName = snapshot.val().trainName;
+    var trainDest = snapshot.val().trainDest;
+    var trainTime = snapshot.val().trainTime;
+    var trainFreq = snapshot.val().trainFreq;
+    var timeMinToArrive = 0;
+    var timeNow = moment();
+    timeMinToArrive = trainInfoDisplay( trainName, trainDest,trainTime,trainFreq );
 
     // add minutes to arrive to current time
     trainTime = moment(timeNow).add(timeMinToArrive,'m');
     var trainTimeTmp = moment(trainTime).format("hh:mm A");
+
     // format train time (HH:mm)
     trainTime = moment(trainTime).format("HH:mm");
 
-
- // trainTime = moment(timeNow).add(timeMinToArrive).format("HH:mm");
-    console.log("timeNow "+timeNow+" timeMinToArrive "+timeMinToArrive);
-    console.log("diff add to table trainTime "+trainTime);
+    // console.log("flag "+displayRowAddedFlag+" snap diff add to table trainTime "+trainTime);
+ 
     // Add each train's data into the table
-    $("#trainTable > tbody").append("<tr><td>" + trainName + "</td><td>" + trainDest + "</td><td>" + trainFreq + "</td><td>" + trainTime +" ("+trainTimeTmp+") "  + "</td><td>" +timeMinToArrive+"</td></tr>");
+    if (!displayRowAddedFlag){
+      if ( !trainClick ) {
+       $("#trainTable > tbody").append("<tr><td>" + trainName + "</td><td>" + trainDest + "</td><td>" + trainFreq + "</td><td>" + trainTime +" ("+trainTimeTmp+") "  + "</td><td>" +timeMinToArrive+"</td></tr>");
+         trainClick = 0;
+      }
+    }
+    else
+      displayRowAddedFlag=1;
   });
 </script>	
 </body>
